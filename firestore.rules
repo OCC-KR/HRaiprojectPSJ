@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /ai_team_survey_v1/{responseId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['aiExperience', 'leaderExperience', 'q1', 'q2', 'q3', 'q4', 'major', 'year', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['aiExperience', 'leaderExperience', 'q1', 'q2', 'q3', 'q4', 'major', 'year', 'createdAt'])
+        && request.resource.data.aiExperience in ['yes', 'no']
+        && request.resource.data.leaderExperience in ['yes', 'no']
+        && request.resource.data.major in ['stem', 'nonstem']
+        && request.resource.data.year is int && request.resource.data.year in [1, 2, 3, 4]
+        && request.resource.data.q1 is int && request.resource.data.q1 >= 1 && request.resource.data.q1 <= 5
+        && request.resource.data.q2 is int && request.resource.data.q2 >= 1 && request.resource.data.q2 <= 5
+        && request.resource.data.q3 is int && request.resource.data.q3 >= 1 && request.resource.data.q3 <= 5
+        && request.resource.data.q4 is int && request.resource.data.q4 >= 1 && request.resource.data.q4 <= 5
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+    match /ai_team_survey_v2/{responseId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['surveyVersion', 'teamExperience', 'aiExperience', 'leaderExperience', 'q1', 'q2', 'q3', 'q4', 'major', 'year', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['surveyVersion', 'teamExperience', 'aiExperience', 'leaderExperience', 'q1', 'q2', 'q3', 'q4', 'major', 'year', 'createdAt'])
+        && request.resource.data.surveyVersion == 2
+        && ((request.resource.data.teamExperience == 'no' && request.resource.data.aiExperience == 'na' && request.resource.data.leaderExperience == 'na')
+          || (request.resource.data.teamExperience == 'yes' && request.resource.data.aiExperience in ['yes', 'no'] && request.resource.data.leaderExperience in ['yes', 'no']))
+        && request.resource.data.major in ['stem', 'nonstem']
+        && request.resource.data.year is int && request.resource.data.year in [1, 2, 3, 4]
+        && request.resource.data.q1 is int && request.resource.data.q1 >= 1 && request.resource.data.q1 <= 5
+        && request.resource.data.q2 is int && request.resource.data.q2 >= 1 && request.resource.data.q2 <= 5
+        && request.resource.data.q3 is int && request.resource.data.q3 >= 1 && request.resource.data.q3 <= 5
+        && request.resource.data.q4 is int && request.resource.data.q4 >= 1 && request.resource.data.q4 <= 5
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+    match /responses/{responseId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['group', 'q1', 'q2', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['group', 'q1', 'q2', 'createdAt'])
+        && request.resource.data.group in ['1학년', '2학년', '3학년', '4학년 이상']
+        && request.resource.data.q1 is int && request.resource.data.q1 >= 1 && request.resource.data.q1 <= 5
+        && request.resource.data.q2 is int && request.resource.data.q2 >= 1 && request.resource.data.q2 <= 5
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+  }
+}
